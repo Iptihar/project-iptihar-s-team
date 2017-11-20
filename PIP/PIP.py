@@ -103,13 +103,14 @@ class PsuedocolorImageProcessing:
         
 def main():
     input_image = cv2.imread("camera4.jpg", 0)
-    colors = ((0, 0, 255), (0, 255, 255), (0, 255, 0), (255, 255, 0), (255, 165, 0), (255, 0, 0), (255, 255, 255)) #note: this is reversed (low to high)
+    colors = ((0, 0, 255), (0, 255, 255), (0, 255, 0), (255, 255, 0), (255, 165, 0), (255, 0, 0), (255, 0, 255)) #note: this is reversed (low to high)
     pip = PsuedocolorImageProcessing()
 
     #Write output file
     output_dir = 'PIP/output/'
         
-    #output_image_1 = pip.get_intensity_slicing(input_image)
+
+
     lower = 150
     upper = 255
     dim = 0.1
@@ -122,8 +123,12 @@ def main():
     Background is a boolean that either keeps or discards the background
     
     '''
-    #output_image_2 = pip.get_intensity_color_transformation(input_image)
     output_image_2 = pip.pseudoColorImage(input_image, colors)
+    '''
+    colors is an array of 3 elements arrays (r,g,b), it is listed from low to high.
+    In the above colors ranges from blue -> light blue -> green -> yellow -> red -> purple
+    note: the image output will be slightly bigger than the input image because of the bar on the right side
+    '''
 
     output_image_name = output_dir + "_Intensity_Slicing_" + datetime.now().strftime("%m%d-%H%M%S")+".jpg"
     cv2.imwrite(output_image_name, output_image_1)
