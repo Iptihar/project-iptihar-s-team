@@ -104,8 +104,6 @@ class ColorModelTransformation:
 
         return output[:,:,3]
 
-        return image
-
     def get_red(self, image):
         """input: rgb color image
             for GUI: need a round radio option button with label:  RED
