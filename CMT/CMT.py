@@ -9,11 +9,12 @@ class ColorModelTransformation:
             for GUI: need a round radio option button with label:  CYAN
             output: cyan color image """
         rows, cols, chans = image.shape
+
         red = image[:, :, 2]
         green = image[:, :, 1]
         blue = image[:, :, 0]
 
-        output = np.zeros((rows, cols, 3), dtype=image.dtype)
+        output = np.ones((rows, cols, 4), np.uint8)
         for i in range(rows):
             for j in range(cols):
                 r = 1 - red[i, j] / 255
@@ -21,10 +22,10 @@ class ColorModelTransformation:
                 b = 1 - blue[i, j] / 255
                 k = min(r,g,b)
 
-                output[i, j, 0] = (r - k) / (1 - k) * 100.
-                output[i, j, 1] = (g - k) / (1 - k) * 100.
+                output[i, j, 0] = (r - k) / (1 - k) * 300.
+                output[i, j, 1] = (g - k) / (1 - k) * 300.
                 output[i, j, 2] = 0
-  #              output[i, j, 3] = k * 100
+                output[i, j, 3] = k * 300.
 
         return output
 
@@ -32,22 +33,76 @@ class ColorModelTransformation:
         """input: rgb color image
             for GUI: need a round radio option button with label:  MAGENTA
             output: magenta color image """
-        image[:,:,1] = 0
+        rows, cols, chans = image.shape
 
-        return image
+        red = image[:, :, 2]
+        green = image[:, :, 1]
+        blue = image[:, :, 0]
+
+        output = np.ones((rows, cols, 4), np.uint8)
+        for i in range(rows):
+            for j in range(cols):
+                r = 1 - red[i, j] / 255
+                g = 1 - green[i, j] / 255
+                b = 1 - blue[i, j] / 255
+                k = min(r, g, b)
+
+                output[i, j, 0] = (r - k) / (1 - k) * 300.
+                output[i, j, 1] = 0
+                output[i, j, 2] = (b - k) / (1 - k) * 300.
+                output[i, j, 3] = k * 300.
+
+        return output
 
     def get_yellow(self, image):
         """input: rgb color image
             for GUI: need a round radio option button with label:  YELLOW
             output: yellow color image """
-        image[:, :, 0] = 0
+        rows, cols, chans = image.shape
 
-        return image
+        red = image[:, :, 2]
+        green = image[:, :, 1]
+        blue = image[:, :, 0]
+
+        output = np.ones((rows, cols, 4), np.uint8)
+        for i in range(rows):
+            for j in range(cols):
+                r = 1 - red[i, j] / 255
+                g = 1 - green[i, j] / 255
+                b = 1 - blue[i, j] / 255
+                k = min(r, g, b)
+
+                output[i, j, 0] = 0
+                output[i, j, 1] = (g - k) / (1 - k) * 300.
+                output[i, j, 2] = (b - k) / (1 - k) * 300.
+                output[i, j, 3] = k * 300.
+
+        return output
 
     def get_black(self, image):
         """input: rgb color image
             for GUI: need a round radio option button with label:  BLACK
             output: black color image """
+        rows, cols, chans = image.shape
+
+        red = image[:, :, 2]
+        green = image[:, :, 1]
+        blue = image[:, :, 0]
+
+        output = np.ones((rows, cols, 4), np.uint8)
+        for i in range(rows):
+            for j in range(cols):
+                r = 1 - red[i, j] / 255
+                g = 1 - green[i, j] / 255
+                b = 1 - blue[i, j] / 255
+                k = min(r, g, b)
+
+                output[i, j, 0] = 0
+                output[i, j, 1] = (g - k) / (1 - k) * 300.
+                output[i, j, 2] = (b - k) / (1 - k) * 300.
+                output[i, j, 3] = k * 300.
+
+        return output[:,:,3]
 
         return image
 
@@ -66,6 +121,7 @@ class ColorModelTransformation:
             for GUI: need a round radio option button with label:  GREEN
             output: green color image """
         green = image[:, :, 1]
+
         output = np.zeros((green.shape[0], green.shape[1], 3), dtype=green.dtype)
         output[:, :, 1] = green
         return output
@@ -107,19 +163,19 @@ class ColorModelTransformation:
 
 def main():
     
-    input_image = cv2.imread("view.jpg")
+    input_image = cv2.imread("Lenna.png")
     cmt = ColorModelTransformation()
 
     #Write output file
     output_dir = 'output/'
         
-    output_image = cmt.get_cyan(input_image)
+    output_image = cmt.get_black(input_image)
 
     cv2.imshow("Lenna", output_image)
     cv2.waitKey(0)
 
- #   output_image_name = output_dir + "_CYAN_" + datetime.now().strftime("%m%d-%H%M%S")+".jpg"
- #   cv2.imwrite(output_image_name, output_image)
+    output_image_name = output_dir + "_BLACK_" + datetime.now().strftime("%m%d-%H%M%S")+".jpg"
+    cv2.imwrite(output_image_name, output_image)
 
 
 if __name__ == "__main__":
