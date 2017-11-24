@@ -20,7 +20,7 @@ root.minsize(1200,800)
 root.maxsize(1200,800)
 
 
-inputimagematrix = cv2.imread("Lenna.png",0)
+inputimagematrix = cv2.imread("Lenna.png",cv2.IMREAD_COLOR)
 img = ImageTk.PhotoImage(Image.open("Lenna.png"))
 preimagelabel = Label(root,image=img,width=500,height=500)
 preimagelabel.size()
@@ -28,7 +28,8 @@ preimagelabel.place(x=50,y=50)
 inputimage = img
 
 PIP = PsuedocolorImageProcessing.PsuedocolorImageProcessing()
-
+CMT = ColorModelTransformation.ColorModelTransformation()
+SAS = SmoothingAndSharpening.SmoothingAndSharpening();
 def executeImageProcessing():
     pf = argumentnotebook.index("current")
 
@@ -36,15 +37,43 @@ def executeImageProcessing():
 
     if (pf == 1):
         print("Process CMT")
-        inimg = inputimage
+        inimg = inputimagematrix
 
-        outimg = inimg#poimg = CMT.pseudoColorProcess(inimg,arg1,...)
-        outimghist = getHistogram(outimg)
-        poimg = ImageTk.PhotoImage(outimghist)
+        # inimg.shape = (inputimage.width(),inputimage.height())
+
+        c = CMTMode.get()
+
+        outimg = None
+        if (c == "R"):
+            outimg = CMT.get_red(image=inimg)
+        elif (c == "G"):
+            outimg = CMT.get_green(image=inimg)
+        elif (c == "B"):
+            outimg = CMT.get_blue(image=inimg)
+        elif (c == "C"):
+            outimg = CMT.get_cyan(image=inimg)
+        elif (c == "M"):
+            outimg = CMT.get_magenta(image=inimg)
+        elif (c == "Y"):
+            outimg = CMT.get_yellow(image=inimg)
+        elif (c == "K"):
+            outimg = CMT.get_black(image=inimg)
+        elif (c == "H"):
+            outimg = CMT.get_hue(image=inimg)
+        elif (c == "S"):
+            outimg = CMT.get_saturation(image=inimg)
+        else:
+            outimg = CMT.get_intensity(image=inimg)
 
 
+        cv2.imwrite("temp.png", outimg)
+
+
+        poimg = ImageTk.PhotoImage(Image.open("temp.png"))  # ImageTk.PhotoImage(outimg)
+        outimg = cv2.imread("temp.png", 0)
         postimagelabel.configure(image=poimg)
         postimagelabel.image = poimg
+        outputimage = outimg
     elif (pf == 0):
         print("Process PIP")
         inimg = inputimagematrix
@@ -201,6 +230,44 @@ removecolorbutton.place(x=150,y=0)
 
 cmtpage = ttk.Frame(argumentnotebook)
 #Inputs:
+CMTPairs = [("R","R"),("G","G"),("B","B"),("C","C"),("M","M"),("Y","Y"),("K","K"),("H","H"),("S","S"),("I","I")]
+radiobuttonwidth = 10
+radiobuttonheight = 1
+radiojustification = RIGHT
+CMTMode = StringVar()
+CMTMode.set("R")
+colorradiobutton_red = Radiobutton(cmtpage,text=CMTPairs[0][0])
+colorradiobutton_red.config(width = radiobuttonwidth, height = radiobuttonheight,justif=radiojustification,variable=CMTMode,value=CMTPairs[0][1])
+colorradiobutton_red.place(x=0,y=0)
+colorradiobutton_green = Radiobutton(cmtpage,text=CMTPairs[1][0])
+colorradiobutton_green.config(width = radiobuttonwidth, height = radiobuttonheight,justify=radiojustification,variable=CMTMode,value=CMTPairs[1][1])
+colorradiobutton_green.place(x=0,y=50)
+colorradiobutton_blue = Radiobutton(cmtpage,text=CMTPairs[2][0])
+colorradiobutton_blue.config(width = radiobuttonwidth, height = radiobuttonheight,justify=radiojustification,variable=CMTMode,value=CMTPairs[2][1])
+colorradiobutton_blue.place(x=0,y=100)
+
+colorradiobutton_Cyan = Radiobutton(cmtpage,text=CMTPairs[3][0])
+colorradiobutton_Cyan.config(width = radiobuttonwidth, height = radiobuttonheight,justify=radiojustification,variable=CMTMode,value=CMTPairs[3][1])
+colorradiobutton_Cyan.place(x=100,y=0)
+colorradiobutton_Magenta = Radiobutton(cmtpage,text=CMTPairs[4][0])
+colorradiobutton_Magenta.config(width = radiobuttonwidth, height = radiobuttonheight,justify=radiojustification,variable=CMTMode,value=CMTPairs[4][1])
+colorradiobutton_Magenta.place(x=100,y=33)
+colorradiobutton_Yellow = Radiobutton(cmtpage,text=CMTPairs[5][0])
+colorradiobutton_Yellow.config(width = radiobuttonwidth, height = radiobuttonheight,justify=radiojustification,variable=CMTMode,value=CMTPairs[5][1])
+colorradiobutton_Yellow.place(x=100,y=66)
+colorradiobutton_Key = Radiobutton(cmtpage,text=CMTPairs[6][0])
+colorradiobutton_Key.config(width = radiobuttonwidth, height = radiobuttonheight,justify=radiojustification,variable=CMTMode,value=CMTPairs[6][1])
+colorradiobutton_Key.place(x=100,y=100)
+
+colorradiobutton_Hue = Radiobutton(cmtpage,text=CMTPairs[7][0])
+colorradiobutton_Hue.config(width = radiobuttonwidth, height = radiobuttonheight,justif=radiojustification,variable=CMTMode,value=CMTPairs[7][1])
+colorradiobutton_Hue.place(x=200,y=0)
+colorradiobutton_Saturation = Radiobutton(cmtpage,text=CMTPairs[8][0])
+colorradiobutton_Saturation.config(width = radiobuttonwidth, height = radiobuttonheight,justify=radiojustification,variable=CMTMode,value=CMTPairs[8][1])
+colorradiobutton_Saturation.place(x=200,y=50)
+colorradiobutton_Intensity = Radiobutton(cmtpage,text=CMTPairs[9][0])
+colorradiobutton_Intensity.config(width = radiobuttonwidth, height = radiobuttonheight,justify=radiojustification,variable=CMTMode,value=CMTPairs[9][1])
+colorradiobutton_Intensity.place(x=200,y=100)
 
 saspage = ttk.Frame(argumentnotebook)
 #Inputs:
