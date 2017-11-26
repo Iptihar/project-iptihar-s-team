@@ -1,0 +1,1 @@
+Psuedocolor image Processing output will be here.
