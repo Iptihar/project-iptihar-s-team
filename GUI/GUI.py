@@ -147,7 +147,7 @@ def chooseInputImage():
 
         preimagelabel.configure(image = im)
         preimagelabel.image = im
-        loadbutton.destroy()
+        
 
 
 
