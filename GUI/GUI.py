@@ -78,6 +78,7 @@ def executeImageProcessing():
     elif (pf == 0):
         print("Process PIP")
         inimg = root.greyinputimagematrix#inputimagematrix
+        print(str(PIPColorArray))
 
         #inimg.shape = (inputimage.width(),inputimage.height())
 
