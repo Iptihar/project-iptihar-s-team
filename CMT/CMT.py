@@ -12,10 +12,10 @@ class ColorModelTransformation:
         im = Image.fromarray(image.astype('uint8'), 'RGB')
         output = im.convert("CMYK")
         output1 = np.array(output)
-        cyan = output1[:,:,2]
+        cyan = output1[:, :, 2]
         im = Image.new("CMYK", (cyan.shape[1], cyan.shape[0]), "white")
         output2 = np.array(im)
-        output2[:,:,2] = cyan
+        output2[:, :, 2] = cyan
 
         return output2
 
@@ -26,10 +26,10 @@ class ColorModelTransformation:
         im = Image.fromarray(image.astype('uint8'), 'RGB')
         output = im.convert("CMYK")
         output1 = np.array(output)
-        cyan = output1[:, :, 1]
-        im = Image.new("CMYK", (cyan.shape[1], cyan.shape[0]), "white")
+        magenta = output1[:, :, 1]
+        im = Image.new("CMYK", (magenta.shape[1], magenta.shape[0]), "white")
         output2 = np.array(im)
-        output2[:, :, 1] = cyan
+        output2[:, :, 1] = magenta
 
         return output2
 
@@ -40,10 +40,10 @@ class ColorModelTransformation:
         im = Image.fromarray(image.astype('uint8'), 'RGB')
         output = im.convert("CMYK")
         output1 = np.array(output)
-        cyan = output1[:, :, 0]
-        im = Image.new("CMYK", (cyan.shape[1], cyan.shape[0]), "white")
+        yellow = output1[:, :, 0]
+        im = Image.new("CMYK", (yellow.shape[1], yellow.shape[0]), "white")
         output2 = np.array(im)
-        output2[:, :, 0] = cyan
+        output2[:, :, 0] = yellow
 
         return output2
 
@@ -51,26 +51,19 @@ class ColorModelTransformation:
         """input: rgb color image
             for GUI: need a round radio option button with label:  BLACK
             output: black color image """
-        rows, cols, chans = image.shape
+        im = Image.fromarray(image.astype('uint8'), 'RGB')
+        output = im.convert("CMYK")
+        output = output.split()
+        cmyk = []
+        for i in range(4):
+            cmyk.append(output[i].load())
+        for i in range(im.size[0]):
+            for j in range(im.size[1]):
+                black = min(cmyk[0][i,j], cmyk[1][i,j], cmyk[2][i,j])
+                cmyk[3][i,j] = black
 
-        red = image[:, :, 2]
-        green = image[:, :, 1]
-        blue = image[:, :, 0]
-
-        output = np.ones((rows, cols, 4), np.uint8)
-        for i in range(rows):
-            for j in range(cols):
-                r = 1 - red[i, j] / 255
-                g = 1 - green[i, j] / 255
-                b = 1 - blue[i, j] / 255
-                k = min(r, g, b)
-
-                output[i, j, 0] = 0
-                output[i, j, 1] = (g - k) / (1 - k) * 300.
-                output[i, j, 2] = (b - k) / (1 - k) * 300.
-                output[i, j, 3] = k * 300.
-
-        return output[:,:,3]
+        k =  np.array(output[3])
+        return k
 
     def get_red(self, image):
         """input: rgb color image
@@ -129,18 +122,18 @@ class ColorModelTransformation:
 
 def main():
     
-    input_image = cv2.imread("Lenna.png")
+    input_image = cv2.imread("view.jpg")
     cmt = ColorModelTransformation()
 
     #Write output file
     output_dir = 'output/'
         
-    output_image = cmt.get_cyan(input_image)
+    output_image = cmt.get_black(input_image)
 
     cv2.imshow("Lenna", output_image)
     cv2.waitKey(0)
 
-#    output_image_name = output_dir + "_BLACK_" + datetime.now().strftime("%m%d-%H%M%S")+".jpg"
+#    output_image_name = output_dir + "_CYAN_" + datetime.now().strftime("%m%d-%H%M%S")+".jpg"
 #    cv2.imwrite(output_image_name, output_image)
 
 
