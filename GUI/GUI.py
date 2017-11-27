@@ -20,7 +20,8 @@ root.minsize(1200,800)
 root.maxsize(1200,800)
 
 
-inputimagematrix = cv2.imread("Lenna.png",cv2.IMREAD_COLOR)
+root.inputimagematrix = cv2.imread("Lenna.png",cv2.IMREAD_COLOR)
+root.greyinputimagematrix = cv2.imread("Lenna.png",0)
 img = ImageTk.PhotoImage(Image.open("Lenna.png"))
 preimagelabel = Label(root,image=img,width=500,height=500)
 preimagelabel.size()
@@ -37,7 +38,7 @@ def executeImageProcessing():
 
     if (pf == 1):
         print("Process CMT")
-        inimg = inputimagematrix
+        inimg = root.inputimagematrix
 
         # inimg.shape = (inputimage.width(),inputimage.height())
 
@@ -76,7 +77,7 @@ def executeImageProcessing():
         outputimage = outimg
     elif (pf == 0):
         print("Process PIP")
-        inimg = inputimagematrix
+        inimg = root.greyinputimagematrix#inputimagematrix
 
         #inimg.shape = (inputimage.width(),inputimage.height())
 
@@ -139,15 +140,18 @@ def chooseInputImage():
     if (filename == ""):
         print("There's nothing here")
     else:
-
-        inputimagematrix = cv2.imread("Lenna.png", 0)
+        print(filename)
+        #print(root.inputimagematrix)
+        root.inputimagematrix =  cv2.imread(filename, cv2.IMREAD_COLOR)
+        root.greyinputimagematrix = cv2.imread(filename, 0)
+        print(root.greyinputimagematrix)
         im = ImageTk.PhotoImage(Image.open(filename))
         inputimage = im
 
 
         preimagelabel.configure(image = im)
         preimagelabel.image = im
-        
+
 
 
 
@@ -173,9 +177,14 @@ PIPColorArray = []
 
 def onColorButtonPressed(index):
     print("The index is "+str(index))
-    #col = askcolor()
-    #if (col[0] != None):
-        #replace the old button
+    col = askcolor()
+    if (col[0] != None):
+        hex = col[1]
+        col = col[0]
+
+        col = (int(col[0]),int(col[1]),int(col[2]))
+        PIPColorArray[index] = col
+        PIPColorButtons[index].config(bg=hex)
 
 
 
@@ -208,12 +217,15 @@ def onAddButtonPressed(number):
 def onRemoveButtonPressed():
 
     if (len(PIPColorArray) > 0):
-        PIPColorArray.remove(len(PIPColorArray)-1)
-        PIPColorButtons.remove(len(PIPColorButtons) - 1)
+        PIPColorArray.remove(PIPColorArray[len(PIPColorArray)-1])
+        b = PIPColorButtons[len(PIPColorButtons) - 1]
+        b.destroy();
+        PIPColorButtons.remove(PIPColorButtons[len(PIPColorButtons) - 1])
         if (len(PIPColorArray) > 0):
             removecolorbutton.config(state=NORMAL)
         else:
             removecolorbutton.config(state=DISABLED)
+
 
 
 colorarraylabel = Label(pippage,text="Color Array")
@@ -270,10 +282,34 @@ colorradiobutton_Intensity.config(width = radiobuttonwidth, height = radiobutton
 colorradiobutton_Intensity.place(x=200,y=100)
 
 saspage = ttk.Frame(argumentnotebook)
-#Inputs:
+SASSmoothingOrSharpeningMode = StringVar(root)
+SASSmoothingOrSharpeningMode.set("Smoothing") # initial value
 
-#w = Spinbox(pippage, from_=0, to=10)
-#w.pack()
+SASModeMenu = OptionMenu(saspage, SASSmoothingOrSharpeningMode, "Smoothing", "Sharpening")
+SASModeMenu.place(x=0,y=0)
+#Inputs:
+#Filter, Cutoff, Order
+OrderVar = IntVar()
+OrderVar.set(1)
+
+orderspinbox = Spinbox(saspage, from_=1, to=10)
+print(orderspinbox.get())
+orderspinbox.config(width=4)
+orderspinbox.place(x=50,y=40)
+orderlabel = Label(saspage,text="Order")
+orderlabel.config(width = 5, height = 1)
+orderlabel.place(x=0,y=40)
+
+cutoffspinbox = Spinbox(saspage, from_=0.0, to=1.0,increment=.1)
+print(cutoffspinbox.get())
+cutoffspinbox.config(width=4)
+cutoffspinbox.place(x=50,y=80)
+cutofflabel = Label(saspage,text="Cutoff")
+cutofflabel.config(width = 5, height = 1)
+cutofflabel.place(x=0,y=80)
+
+#orderspinbox.config(width = 10, height = 1)
+
 
 argumentnotebook.add(pippage,text='PIP')
 argumentnotebook.add(cmtpage,text='CMT')
