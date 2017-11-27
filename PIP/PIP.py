@@ -76,29 +76,19 @@ class PsuedocolorImageProcessing:
 
         return ret
 
-    def doSlice(self, img, lower, upper, dim, background):
-
-        slicing = [0.0] * 256
-
-        if (background):
-            slicing[0] = 0.00390624
-        else:
-            slicing[0] = dim
-        for i in range(1, 256):
-            if (background):
-                slicing[i] = 0.00390625 + slicing[i - 1]
-            else:
-                slicing[i] = dim
-        for i in range(256):
-            if (i >= lower and i <= upper):
-                slicing[i] = 1
-
-        img2 = img.copy()
-        (height, width) = img.shape  # height, width
-        for i in range(height):
-            for j in range(width):
-                img2[i][j] = img[i][j] * slicing[img[i][j]]
-        return img2
+def intensitySlicing(self, img, colors):
+    (height, width) = img.shape
+    max = 255
+    numColors = len(colors)
+    img2 = np.zeros((height, width , 3), np.uint8)
+    for i in range(height):
+        for j in range(width):
+            denom = max / numColors
+            tmp = int(img[i][j] / denom)
+            if (tmp > len(colors)):
+                tmp = len(colors)
+            img2[i][j] = colors[tmp]
+    return img2
 
         
 def main():
@@ -109,13 +99,7 @@ def main():
     #Write output file
     output_dir = 'PIP/output/'
         
-
-
-    lower = 150
-    upper = 255
-    dim = 0.1
-    background = False
-    output_image_1 = pip.doSlice(input_image, lower, upper, dim, background)
+    output_image_1 = pip.intensitySlicing(input_image, colors)
     '''
     lower = the lower end of the histogram to maintain
     upper = the higherend of the histogram to maintain
