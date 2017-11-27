@@ -85,10 +85,11 @@ def intensitySlicing(self, img, colors):
         for j in range(width):
             denom = max / numColors
             tmp = int(img[i][j] / denom)
-            if (tmp > len(colors)):
-                tmp = len(colors)
+            if (tmp > len(colors)-1):
+                tmp = len(colors)-1
             img2[i][j] = colors[tmp]
-    return img2
+    img3 = cv2.cvtColor(img2, cv2.COLOR_BGR2RGB)
+    return img3
 
         
 def main():
