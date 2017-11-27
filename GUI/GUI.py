@@ -81,10 +81,14 @@ def executeImageProcessing():
 
         #inimg.shape = (inputimage.width(),inputimage.height())
 
-        outimg = PIP.pseudoColorImage(img=inimg,colors=PIPColorArray)
+        if (root.PIPPseudoOrSliceMode.get() == 0):
+            outimg = PIP.pseudoColorImage(img=inimg,colors=PIPColorArray)
+        else:
+            outimg = PsuedocolorImageProcessing.intensitySlicing(self=root,img=inimg, colors=PIPColorArray)
+
         cv2.imwrite("temp.png", outimg)
 
-        outimghist = getHistogram(outimg)
+        #outimghist = getHistogram(outimg)
 
 
         poimg = ImageTk.PhotoImage(Image.open("temp.png")) #ImageTk.PhotoImage(outimg)
@@ -94,6 +98,40 @@ def executeImageProcessing():
         outputimage = outimg
     elif (pf == 2):
         print("Process SAS")
+        inimg = root.inputimagematrix  # inputimagematrix
+
+        # inimg.shape = (inputimage.width(),inputimage.height())
+        #'butterworth_low'
+        outimg = inimg
+        if (root.SASSmoothingOrSharpeningMode.get()=="Smoothing"):
+            #Smoothing
+            if (root.SASRGBHSVMode == 0):
+                #rgb
+                outimg = SAS.get_smoothing_RGB(image=inimg, filter="butterworth_low", cutoff=root.cutoffspinbox.get(), order=root.orderspinbox.get())#PIP.pseudoColorImage(img=inimg, colors=PIPColorArray)
+            else:
+                #hsi
+                outimg = SAS.get_smoothing_HSI(image=inimg, filter="butterworth_low", cutoff=root.cutoffspinbox.get(),order=root.orderspinbox.get())  # PIP.pseudoColorImage(img=inimg, colors=PIPColorArray)
+        else:
+            #Sharpening
+            if (root.SASRGBHSVMode == 0):
+                #rgb
+                outimg = SAS.get_sharpening_RGB(image=inimg, filter="butterworth_high", cutoff=root.cutoffspinbox.get(), order=root.orderspinbox.get())#PIP.pseudoColorImage(img=inimg, colors=PIPColorArray)
+            else:
+                #hsi
+                outimg = SAS.get_sharpening_HSI(image=inimg, filter="butterworth_high", cutoff=root.cutoffspinbox.get(),order=root.orderspinbox.get())  # PIP.pseudoColorImage(img=inimg, colors=PIPColorArray)
+
+
+        cv2.imwrite("temp.png", outimg)
+
+        outimghist = getHistogram(outimg)
+
+        poimg = ImageTk.PhotoImage(Image.open("temp.png"))  # ImageTk.PhotoImage(outimg)
+        outimg = cv2.imread("temp.png", 0)
+        postimagelabel.configure(image=poimg)
+        postimagelabel.image = poimg
+        outputimage = outimg
+
+
 
 renderbutton = Button(root,text="Render",command=executeImageProcessing)
 renderbutton.place(x=580,y=200)
@@ -203,7 +241,7 @@ def onAddButtonPressed(number):
 
         localcolorbutton = Button(pippage, command=lambda: onColorButtonPressed(ind))
         localcolorbutton.config(width=2, height=1)
-        localcolorbutton.place(x=220+(25*ind), y=0)
+        localcolorbutton.place(x=290+(25*ind), y=0)
         colorsquarelabel = Label(pippage)
         colorsquarelabel.config(width=1, height=1)
         #colorsquarelabel.config(image=colorsquare)
@@ -211,9 +249,12 @@ def onAddButtonPressed(number):
         PIPColorArray.append(col)
         PIPColorButtons.append(localcolorbutton)
 
-
-
-    removecolorbutton.config(state=NORMAL)
+        if (len(PIPColorArray) > 0):
+            removecolorbutton.config(state=NORMAL)
+            clearcolorbutton.config(state=NORMAL)
+        else:
+            removecolorbutton.config(state=DISABLED)
+            clearcolorbutton.config(state=DISABLED)
 def onRemoveButtonPressed():
 
     if (len(PIPColorArray) > 0):
@@ -223,10 +264,28 @@ def onRemoveButtonPressed():
         PIPColorButtons.remove(PIPColorButtons[len(PIPColorButtons) - 1])
         if (len(PIPColorArray) > 0):
             removecolorbutton.config(state=NORMAL)
+            clearcolorbutton.config(state=NORMAL)
         else:
             removecolorbutton.config(state=DISABLED)
+            clearcolorbutton.config(state=DISABLED)
+
+def onClearButtonPressed():
+    while(len(PIPColorArray) > 0):
+        PIPColorArray.remove(PIPColorArray[len(PIPColorArray)-1])
+        b = PIPColorButtons[len(PIPColorButtons) - 1]
+        b.destroy();
+        PIPColorButtons.remove(PIPColorButtons[len(PIPColorButtons) - 1])
+    if (len(PIPColorArray) > 0):
+        removecolorbutton.config(state=NORMAL)
+        clearcolorbutton.config(state=NORMAL)
+    else:
+        removecolorbutton.config(state=DISABLED)
+        clearcolorbutton.config(state=DISABLED)
 
 
+radiobuttonwidth = 10
+radiobuttonheight = 1
+radiojustification = RIGHT
 
 colorarraylabel = Label(pippage,text="Color Array")
 colorarraylabel.config(width = 10, height = 1)
@@ -238,16 +297,28 @@ addcolorbutton.place(x=80,y=0)
 removecolorbutton = Button(pippage,state=DISABLED,text="Remove",command=lambda: onRemoveButtonPressed())
 removecolorbutton.config(width = 8, height = 1)
 removecolorbutton.place(x=150,y=0)
+clearcolorbutton = Button(pippage,state=DISABLED,text="Clear",command=lambda: onClearButtonPressed())
+clearcolorbutton.config(width = 8, height = 1)
+clearcolorbutton.place(x=220,y=0)
+
+root.PIPPseudoOrSliceMode = IntVar()
+root.PIPPseudoOrSliceMode.set(0)
+pipPseudoRadiobutton = Radiobutton(pippage,text="Pseudo Image Coloring")
+pipPseudoRadiobutton.config(width = int(radiobuttonwidth*1.75), height = radiobuttonheight,justif=LEFT,variable=root.PIPPseudoOrSliceMode,value=0)
+pipPseudoRadiobutton.place(x=0,y=40)
+pipIntensitySlicingRadiobutton = Radiobutton(pippage,text="Intensity Slicing")
+pipIntensitySlicingRadiobutton.config(width = int(radiobuttonwidth*1.25), height = radiobuttonheight,justif=LEFT,variable=root.PIPPseudoOrSliceMode,value=1)
+pipIntensitySlicingRadiobutton.place(x=0,y=80)
+
 
 
 cmtpage = ttk.Frame(argumentnotebook)
 #Inputs:
 CMTPairs = [("R","R"),("G","G"),("B","B"),("C","C"),("M","M"),("Y","Y"),("K","K"),("H","H"),("S","S"),("I","I")]
-radiobuttonwidth = 10
-radiobuttonheight = 1
-radiojustification = RIGHT
+
 CMTMode = StringVar()
 CMTMode.set("R")
+
 colorradiobutton_red = Radiobutton(cmtpage,text=CMTPairs[0][0])
 colorradiobutton_red.config(width = radiobuttonwidth, height = radiobuttonheight,justif=radiojustification,variable=CMTMode,value=CMTPairs[0][1])
 colorradiobutton_red.place(x=0,y=0)
@@ -282,32 +353,41 @@ colorradiobutton_Intensity.config(width = radiobuttonwidth, height = radiobutton
 colorradiobutton_Intensity.place(x=200,y=100)
 
 saspage = ttk.Frame(argumentnotebook)
-SASSmoothingOrSharpeningMode = StringVar(root)
-SASSmoothingOrSharpeningMode.set("Smoothing") # initial value
+root.SASSmoothingOrSharpeningMode = StringVar(root)
+root.SASSmoothingOrSharpeningMode.set("Smoothing") # initial value
 
-SASModeMenu = OptionMenu(saspage, SASSmoothingOrSharpeningMode, "Smoothing", "Sharpening")
+SASModeMenu = OptionMenu(saspage, root.SASSmoothingOrSharpeningMode, "Smoothing", "Sharpening")
 SASModeMenu.place(x=0,y=0)
+
 #Inputs:
 #Filter, Cutoff, Order
 OrderVar = IntVar()
 OrderVar.set(1)
 
-orderspinbox = Spinbox(saspage, from_=1, to=10)
-print(orderspinbox.get())
-orderspinbox.config(width=4)
-orderspinbox.place(x=50,y=40)
+root.orderspinbox = Spinbox(saspage, from_=1, to=10)
+print(root.orderspinbox.get())
+root.orderspinbox.config(width=4)
+root.orderspinbox.place(x=50,y=40)
 orderlabel = Label(saspage,text="Order")
 orderlabel.config(width = 5, height = 1)
 orderlabel.place(x=0,y=40)
 
-cutoffspinbox = Spinbox(saspage, from_=0.0, to=1.0,increment=.1)
-print(cutoffspinbox.get())
-cutoffspinbox.config(width=4)
-cutoffspinbox.place(x=50,y=80)
+root.cutoffspinbox = Spinbox(saspage, from_=1, to=10,increment=1)
+print(root.cutoffspinbox.get())
+root.cutoffspinbox.config(width=4)
+root.cutoffspinbox.place(x=50,y=80)
 cutofflabel = Label(saspage,text="Cutoff")
 cutofflabel.config(width = 5, height = 1)
 cutofflabel.place(x=0,y=80)
 
+root.SASRGBHSVMode = IntVar()
+root.SASRGBHSVMode.set(0)
+sasRGBRadiobutton = Radiobutton(saspage,text="RGB")
+sasRGBRadiobutton.config(width = int(radiobuttonwidth*.5), height = radiobuttonheight,justif=radiojustification,variable=root.SASRGBHSVMode,value=0)
+sasRGBRadiobutton.place(x=0,y=110)
+sasHSIRadiobutton = Radiobutton(saspage,text="HSI")
+sasHSIRadiobutton.config(width = int(radiobuttonwidth*.5), height = radiobuttonheight,justif=radiojustification,variable=root.SASRGBHSVMode,value=1)
+sasHSIRadiobutton.place(x=50,y=110)
 #orderspinbox.config(width = 10, height = 1)
 
 
