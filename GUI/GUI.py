@@ -78,6 +78,7 @@ def executeImageProcessing():
     elif (pf == 0):
         print("Process PIP")
         inimg = root.greyinputimagematrix#inputimagematrix
+        print(str(PIPColorArray))
 
         #inimg.shape = (inputimage.width(),inputimage.height())
 
@@ -103,23 +104,26 @@ def executeImageProcessing():
         # inimg.shape = (inputimage.width(),inputimage.height())
         #'butterworth_low'
         outimg = inimg
-        m = (min(inimg.shape[0],inimg.shape[1])/2)
+        m = float(root.cutoffspinbox.get())#(min(inimg.shape[0],inimg.shape[1])/2)
+        o = int(root.orderspinbox.get())
+        print(m)
+        print(o)
         if (root.SASSmoothingOrSharpeningMode.get()=="Smoothing"):
             #Smoothing
             if (root.SASRGBHSVMode == 0):
                 #rgb
-                outimg = SAS.get_smoothing_RGB(image=inimg, filter="butterworth_low", cutoff=m, order=int(root.orderspinbox.get()))#PIP.pseudoColorImage(img=inimg, colors=PIPColorArray)
+                outimg = SAS.get_smoothing_RGB(image=inimg, filter="butterworth_low", cutoff=m, order=o)#PIP.pseudoColorImage(img=inimg, colors=PIPColorArray)
             else:
                 #hsi
-                outimg = SAS.get_smoothing_HSI(image=inimg, filter="butterworth_low", cutoff=m,order=int(root.orderspinbox.get()))  # PIP.pseudoColorImage(img=inimg, colors=PIPColorArray)
+                outimg = SAS.get_smoothing_HSI(image=inimg, filter="butterworth_low", cutoff=m,order=o)  # PIP.pseudoColorImage(img=inimg, colors=PIPColorArray)
         else:
             #Sharpening
             if (root.SASRGBHSVMode == 0):
                 #rgb
-                outimg = SAS.get_sharpening_RGB(image=inimg, filter="butterworth_high", cutoff=m, order=int(root.orderspinbox.get()))#PIP.pseudoColorImage(img=inimg, colors=PIPColorArray)
+                outimg = SAS.get_sharpening_RGB(image=inimg, filter="butterworth_high", cutoff=m, order=o)#PIP.pseudoColorImage(img=inimg, colors=PIPColorArray)
             else:
                 #hsi
-                outimg = SAS.get_sharpening_HSI(image=inimg, filter="butterworth_high", cutoff=m,order=int(root.orderspinbox.get()))  # PIP.pseudoColorImage(img=inimg, colors=PIPColorArray)
+                outimg = SAS.get_sharpening_HSI(image=inimg, filter="butterworth_high", cutoff=m,order=o)  # PIP.pseudoColorImage(img=inimg, colors=PIPColorArray)
 
 
         cv2.imwrite("temp.png", outimg)
@@ -362,19 +366,23 @@ SASModeMenu.place(x=0,y=0)
 
 #Inputs:
 #Filter, Cutoff, Order
-OrderVar = IntVar()
-OrderVar.set(1)
+root.OrderVar = IntVar()
+root.OrderVar.set(2)
 
 root.orderspinbox = Spinbox(saspage, from_=2, to=10)
-root.orderspinbox.config(state=DISABLED)
-print(root.orderspinbox.get())
+#root.orderspinbox.config(state=DISABLED)
+root.orderspinbox.config(from_=1)
 root.orderspinbox.config(width=4)
 root.orderspinbox.place(x=50,y=40)
+
 orderlabel = Label(saspage,text="Order")
 orderlabel.config(width = 5, height = 1)
 orderlabel.place(x=0,y=40)
 
-root.cutoffspinbox = Spinbox(saspage, from_=1, to=10,increment=1)
+root.CutoffVar = IntVar()
+root.CutoffVar.set(2)
+root.cutoffspinbox = Spinbox(saspage, from_=256, to=512,increment=1)
+root.cutoffspinbox.config(from_=1)
 print(root.cutoffspinbox.get())
 root.cutoffspinbox.config(width=4)
 root.cutoffspinbox.place(x=50,y=80)
