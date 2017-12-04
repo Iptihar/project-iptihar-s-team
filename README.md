@@ -14,3 +14,5 @@ however you like, each file include a main function so you can test directly fro
 Scheme is desgined to make it easy for GUI, any suggestions are welcome.
 
 Please edit and push only to your own subfolder, avoid overlap other's code.
+
+*Note: this ReadMe file is NOT report, report is posted in file report.md
