@@ -122,19 +122,20 @@ class ColorModelTransformation:
 
 def main():
     
-    input_image = cv2.imread("view.jpg")
+    input_image = cv2.imread("Lenna.png")
     cmt = ColorModelTransformation()
 
     #Write output file
     output_dir = 'output/'
-        
-    output_image = cmt.get_black(input_image)
+
+    #change function below to test run
+    output_image = cmt.get_intensity(input_image)
 
     cv2.imshow("Lenna", output_image)
     cv2.waitKey(0)
 
-#    output_image_name = output_dir + "_CYAN_" + datetime.now().strftime("%m%d-%H%M%S")+".jpg"
-#    cv2.imwrite(output_image_name, output_image)
+    output_image_name = output_dir + "_INTENSITY_" + datetime.now().strftime("%m%d-%H%M%S")+".jpg"
+    cv2.imwrite(output_image_name, output_image)
 
 
 if __name__ == "__main__":
