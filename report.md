@@ -51,13 +51,27 @@ defined functions, only some basic operations are done by built-in functions lik
 and conver them to numpy array...etc.
 
 2. Psuedocolor image Processing: by Julian
+Input: A grayscale image and an array of colors (stored as an array of array, each array in the color array has 3 elements stored as an integer 0-255 as RGB)
+Output: A psuedocolor color image, the output image is slightly larger because the gradient is added to the right side of the image. This does not happen for intensity slicing.
 
+Both psuedocolor and intensity slicing work the same. The only difference is psuedocolor uses a blended gradient. 
+Libraries used: cv2, math, numpy
 
+---pseudoColorImage---
+This function takes in the array of colors stored as [[R,G,B],[R,G,B], ... ]. It then separates the colors into 3 separate arrays. Each color is then blended in the rgb color space separately. Colors chosen from hsv value seem to not blend properly. Using prechosen colors in the gui seems to work properly. The function also adds a gradient to the right side of the image for comparison. The resulting image is a psuedocolor image based on the grayscale input image.
 
+---intensitySlicing---
+This function takes in the same inputs as the previous function. The difference between this function and the previous is this function does not blend the color gradient. Other than that, the function is the same.
 
+---createGradient---
+This function creates the gradient, it uses linear change. Each color channel is fed separately. Both input and output are arrays. The output is a 256 elements to create a gradient.
 
+---seperateColors---
+separated the colors array into 3 separate color arrays to feed into create gradient
 
+Main function allows the module to be ran by itself.
 
+The way the psuedocolor function works is it takes an array of colors. If intensity color is selected, the gradient is not blended, if not, the gradient is blended. Once that is determined. The gradient is created accordingly and applied. The gradient is set to take in the intensity value (from 0 - 255) and returns the color to apply to the pixel. Each pixel is then replaced with the corresponding value from the gradient. The resulting image is the psuedocolor image.
 
 
 3. Smoothing and Sharpening: by Brad
