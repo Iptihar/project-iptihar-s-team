@@ -62,7 +62,25 @@ and conver them to numpy array...etc.
 
 3. Smoothing and Sharpening: by Brad
 
+Input(for all functions): any RGB image, a string filter("butterworth_high"/"butterworth_low"), and 2 integers cutoff, and order.
 
+Outputs(get_smoothing_RGB / get_sharpening_RGB): An RGB image after applying smoothing or sharpening on it using the filter argument in the RGB colorspace.
+
+Outputs(get_smoothing_HSI / get_sharpening_HSI): An RGB image after applying smoothing or sharpening on it using the filter argument in the HSI colorspace.
+
+libraries used: cv2, numpy
+
+
+
+get_smoothing_RGB / get_sharpening_RGB involves splitting an RGB image into 3 images (standard order of splitting in cv2 is blue, green, red).
+then applying the smoothing or sharpening methods to each of the 3 images. In this implementation I applied the smoothing and sharpening methods in the images
+frequency domains. After the necessary steps for frequency filtering is done for each image, blue, green, and red. I merged them back and displayed the resulting
+RGB image.
+
+
+get_smoothing_HSI / get_sharpening_HSI involves the same steps as before except you convert the RGB image into the HSI domain and apply
+the frequency filtering only on the intensity image. Once finished I merged the intensity image back with the hue and saturation images.
+Then converted that HSI image back into an RGB image for output.
 
 
 
